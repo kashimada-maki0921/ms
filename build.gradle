@@ -1,0 +1,129 @@
+buildscript {
+	ext {
+		kotlinVersion = '1.3.31'
+		springBootVersion = '2.1.3.RELEASE'
+		springSecurityVersion = '5.2.0.M4'
+		protoBufVersion = '3.6.1'
+		protoBufGradleVersion = '0.8.8'
+		mapStructVersion = '1.3.0.Final'
+		apacheCommonsVersion = '3.8.1'
+		servletApi = '3.1.0'
+		mysqlConnectorJavaVersion = '8.0.15'
+		mysqlSocketFactoryVersion = '1.0.12'
+	}
+	repositories {
+		mavenCentral()
+		maven { url 'https://repo.spring.io/snapshot' }
+		maven { url 'https://repo.spring.io/milestone' }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+		// ProtocolBuffers
+		classpath("com.google.protobuf:protobuf-gradle-plugin:${protoBufGradleVersion}")
+	}
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'kotlin-kapt'
+// ProtocolBuffers
+apply plugin: 'com.google.protobuf'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/snapshot' }
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+configurations {
+	compile.exclude module: "spring-boot-starter-tomcat"
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-aop'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	implementation "org.jetbrains.kotlin:kotlin-reflect"
+	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// DOMA
+	implementation("org.seasar.doma.boot:doma-spring-boot-starter:latest.release")
+	implementation("org.seasar.doma:doma:latest.release")
+	kapt("org.seasar.doma:doma:latest.release")
+	// ProtocolBuffers
+	implementation("com.google.protobuf:protobuf-java:${protoBufVersion}")
+	// SpringFox
+	implementation("io.springfox:springfox-swagger2:latest.release")
+	implementation("io.springfox:springfox-swagger-ui:latest.release")
+	implementation("com.hubspot.jackson:jackson-datatype-protobuf:latest.release")
+	// MapStruct
+	implementation("org.mapstruct:mapstruct-jdk8:${mapStructVersion}")
+	implementation("org.mapstruct:mapstruct-processor:${mapStructVersion}")
+	kapt("org.mapstruct:mapstruct-processor:${mapStructVersion}")
+	// Spring Security
+	compile("org.springframework.security:spring-security-core:${springSecurityVersion}")
+	// Apache Commons
+	compile("org.apache.commons:commons-lang3:${apacheCommonsVersion}")
+}
+
+kapt {
+	arguments {
+		arg("doma.resources.dir", compileKotlin.destinationDir)
+	}
+}
+
+test{
+	useJUnitPlatform()
+}
+
+// DOMAで使用するSQLファイル等の読み込み
+task copyDomaResources(type: Sync) {
+	from sourceSets.main.resources.srcDirs
+	into compileKotlin.destinationDir
+	include 'doma.compile.config'
+	include 'META-INF/**/*.sql'
+	include 'META-INF/**/*.script'
+}
+
+compileKotlin {
+	dependsOn copyDomaResources
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict']
+		jvmTarget = '1.8'
+	}
+}
+
+compileTestKotlin {
+	kotlinOptions {
+		freeCompilerArgs = ['-Xjsr305=strict']
+		jvmTarget = '1.8'
+	}
+}
+
+// ProtocolBuffers
+protobuf {
+	protoc {
+		artifact = "com.google.protobuf:protoc:${protoBufVersion}"
+	}
+	generateProtoTasks {
+		all().each { task ->
+			task.builtins {
+				java {
+					outputSubDir = 'java'
+				}
+			}
+		}
+	}
+	generatedFilesBaseDir = "$projectDir/src"
+}
