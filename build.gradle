@@ -1,34 +1,38 @@
 buildscript {
-	ext {
-		kotlinVersion = '1.3.31'
-		springBootVersion = '2.1.3.RELEASE'
-		springSecurityVersion = '5.2.0.M4'
-		protoBufVersion = '3.6.1'
-		protoBufGradleVersion = '0.8.8'
-		mapStructVersion = '1.3.0.Final'
-		apacheCommonsVersion = '3.8.1'
-		servletApi = '3.1.0'
-		mysqlConnectorJavaVersion = '8.0.15'
-		mysqlSocketFactoryVersion = '1.0.12'
-	}
-	repositories {
-		mavenCentral()
-		maven { url 'https://repo.spring.io/snapshot' }
-		maven { url 'https://repo.spring.io/milestone' }
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-		// ProtocolBuffers
-		classpath("com.google.protobuf:protobuf-gradle-plugin:${protoBufGradleVersion}")
-	}
+    ext {
+        kotlinVersion = '1.3.31'
+        springBootVersion = '2.1.3.RELEASE'
+        springSecurityVersion = '5.2.0.M4'
+        protoBufVersion = '3.6.1'
+        protoBufGradleVersion = '0.8.8'
+        mapStructVersion = '1.3.0.Final'
+        apacheCommonsVersion = '3.8.1'
+        servletApi = '3.1.0'
+        mysqlConnectorJavaVersion = '8.0.15'
+        mysqlSocketFactoryVersion = '1.0.12'
+        protoBufVersion = '3.6.1'
+        protoBufGradleVersion = '0.8.7'
+    }
+    repositories {
+        mavenCentral()
+        maven { url 'https://repo.spring.io/snapshot' }
+        maven { url 'https://repo.spring.io/milestone' }
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+        classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        // ProtocolBuffers
+        classpath("com.google.protobuf:protobuf-gradle-plugin:${protoBufGradleVersion}")
+    }
 }
 
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-spring'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
+//ProtocolBuffers
+apply plugin: 'com.google.protobuf'
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -50,6 +54,12 @@ dependencies {
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // ProtocolBuffers
+    implementation("com.google.protobuf:protobuf-java:${protoBufVersion}")
+    // SpringFox
+    implementation("io.springfox:springfox-swagger2:latest.release")
+    implementation("io.springfox:springfox-swagger-ui:latest.release")
+    implementation("com.hubspot.jackson:jackson-datatype-protobuf:latest.release")
 }
 
 compileKotlin {
@@ -64,4 +74,21 @@ compileTestKotlin {
         freeCompilerArgs = ['-Xjsr305=strict']
         jvmTarget = '1.8'
     }
+}
+
+// ProtocolBuffers
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${protoBufVersion}"
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    outputSubDir = 'java'
+                }
+            }
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src"
 }
