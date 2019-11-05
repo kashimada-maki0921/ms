@@ -10,11 +10,14 @@ buildscript {
 		servletApi = '3.1.0'
 		mysqlConnectorJavaVersion = '8.0.15'
 		mysqlSocketFactoryVersion = '1.0.12'
+        flywayVersion = '5.2.4'
 	}
 	repositories {
 		mavenCentral()
 		maven { url 'https://repo.spring.io/snapshot' }
 		maven { url 'https://repo.spring.io/milestone' }
+        // for Flyway plugin
+        maven { url "https://plugins.gradle.org/m2/" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -22,6 +25,8 @@ buildscript {
 		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
 		// ProtocolBuffers
 		classpath("com.google.protobuf:protobuf-gradle-plugin:${protoBufGradleVersion}")
+        // for Flyway plugin
+        classpath "gradle.plugin.com.boxfuse.client:gradle-plugin-publishing:${flywayVersion}"
 	}
 }
 
@@ -32,6 +37,8 @@ apply plugin: 'io.spring.dependency-management'
 apply plugin: 'kotlin-kapt'
 //ProtocolBuffers
 apply plugin: 'com.google.protobuf'
+// for Flyway plugin
+apply plugin: "org.flywaydb.flyway"
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
@@ -63,6 +70,17 @@ dependencies {
     implementation("io.springfox:springfox-swagger2:latest.release")
     implementation("io.springfox:springfox-swagger-ui:latest.release")
     implementation("com.hubspot.jackson:jackson-datatype-protobuf:latest.release")
+    compile("mysql:mysql-connector-java:${mysqlConnectorJavaVersion}")
+}
+
+// for Flyway plugin(Local Environment)
+flyway {
+    url = 'jdbc:mysql://localhost:3318?useSSL=false'
+    user = 'root'
+    password = 'root_password'
+    schemas = ['user']
+    baselineVersion = '0.0.1'
+    locations = ['filesystem:src/main/resources/db/migration/common', 'filesystem:src/main/resources/db/migration/local']
 }
 
 kapt {
@@ -71,7 +89,7 @@ kapt {
         	}
     }
 
-        // DOMAで使用するSQLファイル等の読み込み
+// DOMAで使用するSQLファイル等の読み込み
 task copyDomaResources(type: Sync)  {
     	from sourceSets.main.resources.srcDirs
     	into compileKotlin.destinationDir
