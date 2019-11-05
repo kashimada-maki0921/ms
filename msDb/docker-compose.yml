@@ -6,7 +6,7 @@ services:
     container_name: "msDb"
     hostname: "msDb"
     ports:
-      - "3316:3306"
+      - "3318:3306"
     volumes:
       - "./sql:/docker-entrypoint-initdb.d"
     environment:

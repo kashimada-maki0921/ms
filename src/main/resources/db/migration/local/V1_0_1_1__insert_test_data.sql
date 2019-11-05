@@ -1,0 +1,9 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+SET @USER_ID=1;
+
+# ユーザーテーブル
+INSERT INTO users (id)
+VALUES (@USER_ID);
+
+SET FOREIGN_KEY_CHECKS = 1;
