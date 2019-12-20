@@ -3,10 +3,10 @@ syntax = "proto3";
 package user;
 
 option java_package = "com.example.proto.user";
-option java_outer_classname = "UserProto";
+option java_outer_classname = "UserBodyProto";
 
 // ユーザーの身体情報
-message  UserBody {
+message  User {
     int64 userId = 1;
     string sex = 2;
     int32 height = 3;
