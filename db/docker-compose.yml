@@ -8,7 +8,8 @@ services:
     ports:
       - "3318:3306"
     volumes:
-      - "./sql:/docker-entrypoint-initdb.d"
+      - "./docker/mysql/initdb.d:/docker-entrypoint-initdb.d"
+      - "./docker/mysql/conf:/etc/mysql/conf.d"
     environment:
       MYSQL_ROOT_PASSWORD: root_password
       TZ: Asia/Tokyo

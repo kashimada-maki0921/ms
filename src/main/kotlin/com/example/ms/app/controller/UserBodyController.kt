@@ -17,7 +17,7 @@ class UserBodyController(private val userService: UserBodyService) {
     /**
      * ユーザー身体情報を登録
      */
-    @PostMapping
+    @PostMapping(path = ["body"])
     @ApiOperation(value = "ユーザー身体情報登録")
     fun addUser(@RequestBody userBodyForm: UserBodyForm): ResponseEntity<UserBodyProto.User> {
         val user = userService.insertUserBodyInfo(userBodyForm.let {

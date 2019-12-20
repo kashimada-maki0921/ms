@@ -12,5 +12,19 @@ docker-compose up -d
 | ホスト     | 127.0.0.1     |
 | ユーザ名   | root          |
 | パスワード | root_password |
-| ポート     | 3316          |
+| ポート     | 3318          |
 | SSL使用    | OFF           |
+
+## PHPMyAdmin
+
+[PHPMyAdmin](http://localhost:51000)
+
+## generalLogの見方
+コンテナに入る
+```
+docker exec -it ms_db bash
+```
+ログ出力
+```
+tail -f /var/log/mysql/mysqld.log
+```
