@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository
 @Repository
 @ConfigAutowireable
 interface UserBodyDao {
+    @Select
+    fun findByUserId(userId: Long): UserBodyEntity
+
     @Insert
     fun insertUsersBody(userBodyEntity: UserBodyEntity): Result<UserBodyEntity>
 }
