@@ -9,7 +9,11 @@ import org.springframework.stereotype.Service
  */
 @Service
 class UserBodyServiceImpl(private val userRepository: UserBodyRepository) : UserBodyService {
-    override fun insertUserBodyInfo(userBodyModel: UserBodyModel):UserBodyModel {
-       return userRepository.insertUserBodyInfo(userBodyModel)
+    override fun findUserBy(userId: Long): UserBodyModel {
+        return userRepository.findByUserId(userId)
+    }
+
+    override fun insertUserBodyInfo(userBodyModel: UserBodyModel): UserBodyModel {
+        return userRepository.insertUserBodyInfo(userBodyModel)
     }
 }

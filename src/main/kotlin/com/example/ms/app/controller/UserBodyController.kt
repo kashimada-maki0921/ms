@@ -13,6 +13,19 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping(value = ["users"])
 @Api(tags = ["ユーザー身体情報"])
 class UserBodyController(private val userService: UserBodyService) {
+    @GetMapping(path = ["{user_id}"])
+    @ApiOperation(value = "ユーザー身体情報取得")
+    fun userBody(@PathVariable(value = "user_id") userId: Long): ResponseEntity<UserBodyProto.User> {
+        val user = userService.findUserBy(userId)
+
+        val userBodyProto = UserBodyProto.User.newBuilder()
+                .setUserId(user.userId)
+                .setSex(user.sex)
+                .setHeight(user.height)
+                .setWeight(user.weight)
+                .build()
+        return ResponseEntity.ok(userBodyProto)
+    }
 
     /**
      * ユーザー身体情報を登録
@@ -29,12 +42,12 @@ class UserBodyController(private val userService: UserBodyService) {
             )
         })
 
-        val userProto = UserBodyProto.User.newBuilder()
+        val userBodyProto = UserBodyProto.User.newBuilder()
                 .setUserId(user.userId)
                 .setSex(user.sex)
                 .setHeight(user.height)
                 .setWeight(user.weight)
                 .build()
-        return ResponseEntity.ok(userProto)
+        return ResponseEntity.ok(userBodyProto)
     }
 }

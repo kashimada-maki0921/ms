@@ -10,9 +10,24 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class UserBodyRepositoryImpl(private val userBodyDao: UserBodyDao) : UserBodyRepository {
+    override fun findByUserId(userId: Long): UserBodyModel {
+        return userBodyDao.findByUserId(userId).convertIntoUserBodyModel()
+    }
+
     override fun insertUserBodyInfo(userBodyModel: UserBodyModel): UserBodyModel {
         userBodyDao.insertUsersBody(userBodyModel.convertIntoUserEntity())
         return userBodyModel
+    }
+
+    private fun UserBodyEntity.convertIntoUserBodyModel(): UserBodyModel {
+        return this.let {
+            UserBodyModel(
+                    it.userId,
+                    it.sex,
+                    it.height,
+                    it.weight
+            )
+        }
     }
 
     private fun UserBodyModel.convertIntoUserEntity(): UserBodyEntity {
